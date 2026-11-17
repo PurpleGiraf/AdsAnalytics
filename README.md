@@ -81,6 +81,21 @@ ruff check . && ruff format --check .
 
 Without uv: `python3.11 -m venv .venv && source .venv/bin/activate && pip install -e '.[dev]'`.
 
+#### RLS isolation tests
+
+`tests/test_rls.py` proves each client only sees their own data and that nobody but the service role can read `connection_secrets`. It needs a database:
+
+```bash
+export DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+pytest
+```
+
+Without `DATABASE_URL` the isolation tests are skipped locally (CI fails instead). Every test runs in a transaction that's rolled back, so it leaves no data behind.
+
+To run them against a throwaway plain Postgres 16 instead of Supabase (this is what CI does), set `PGA_TEST_PLAIN_POSTGRES=1`. That mode **drops and rebuilds the `reporting` schema**, so it refuses to run against anything that looks like Supabase.
+
+Every new table in `reporting` must be classified in `test_rls.py` (client-scoped with a seed row, special with its own tests, or global). An unclassified table fails the suite.
+
 ### Web app (Next.js)
 
 ```bash
