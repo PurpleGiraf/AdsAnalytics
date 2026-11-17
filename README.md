@@ -8,6 +8,7 @@ Before writing any code, read:
 - `docs/02-architecture.md` for the stack and data model
 - `docs/01-api-access.md` for the platform API approvals (start these early, they take a while)
 - `BUILD_INSTRUCTIONS.md` for the phase-by-phase build plan
+- `docs/03-borrowing-from-other-repos.md` before reading or reusing anything from another repo
 
 ## Repo layout
 

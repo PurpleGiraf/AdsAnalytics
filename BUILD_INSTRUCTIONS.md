@@ -239,7 +239,7 @@ Prepare deployment, everything in Australia:
 - Web app: deploy to a host with a Sydney region (Vercel with the syd1 function region, or Cloud Run in australia-southeast1). Set function region explicitly.
 - Ingestion: Dockerfile for ingestion/, run nightly at 3am Adelaide time as a scheduled job in australia-southeast1 (Cloud Run Jobs + Cloud Scheduler) or ap-southeast-2. Secrets from the cloud secret manager, not baked into the image.
 - PDF rendering worker: same image with Playwright + Chromium, enough memory (2 GB+).
-- Write docs/03-runbook.md: how to add a client, connect each platform, rotate PGA_ENCRYPTION_KEY, what to do when a token expires, and how to re-run a failed sync.
+- Write docs/04-runbook.md: how to add a client, connect each platform, rotate PGA_ENCRYPTION_KEY, what to do when a token expires, and how to re-run a failed sync.
 ```
 
 ---
