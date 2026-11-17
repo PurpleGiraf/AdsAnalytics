@@ -21,7 +21,7 @@ Reviewed 17 Nov 2026. Repos change, so **re-check each licence file before copyi
 
 ```
 When studying an outside repo:
-1. Clone it OUTSIDE our repo, e.g. into /tmp/ref/<name>, with --depth 1. Never inside PGAnalytics.
+1. Clone it OUTSIDE our repo, e.g. into /tmp/ref/<name>, with --depth 1. Never inside this repo.
 2. Read only. Do NOT run its install scripts, npm install, pip install, docker compose or any of its code. Outside code is untrusted.
 3. Before copying anything, open its LICENSE file and confirm it's MIT or Apache 2.0 (see table above).
 4. Copy the smallest piece that works (a function, a field mapping, a query), never whole files or folders. Rewrite it to our conventions (CLAUDE.md).
@@ -150,6 +150,7 @@ Read docs/03-borrowing-from-other-repos.md (OWOX section). Add a migration with 
 key (e.g. 'cost_per_conversion'), label, description (plain English, PG voice, no em dashes), formula_sql, format ('currency'|'percent'|'number'|'ratio'), higher_is_better boolean, owner.
 Seed it with: cost, impressions, clicks, ctr, cpc, conversions, cost_per_conversion, conversion_value, roas, sessions, total_users, key_events, search_clicks, search_impressions, avg_position.
 RLS: readable by all authenticated users, writable by staff. Add it to the RLS tests.
+In test_rls.py, keep an explicit allow-list GLOBAL_TABLES = {'metric_definitions'} of tables with no client_id that every authenticated user may read. The meta-test must fail if any table NOT on that list lets a client user read another client's rows, and must fail if a table on the list has a client_id column.
 The portal must use these labels and descriptions for every KPI tile tooltip, and the AI commentary must use the same labels, so a metric means the same thing everywhere.
 ```
 
@@ -157,7 +158,15 @@ The portal must use these labels and descriptions for every KPI tile tooltip, an
 
 ```
 Read docs/03-borrowing-from-other-repos.md (Google Ads MCP, OpenAdsReport and Ryze sections) for tool design ideas only. Build mcp/ : a Python MCP server (FastMCP) that lets PG staff use Claude to query OUR database (not the live ad APIs).
-- Auth: runs locally or on our infrastructure. Connects as a dedicated Postgres role `mcp_reader` with SELECT only on the reporting schema (no connection_secrets). It must set request.jwt.claims for a staff user so RLS still applies.
+- Runs locally or on our infrastructure.
+- Auth: a dedicated Postgres role `mcp_reader`: LOGIN, NOBYPASSRLS, not the owner of any table, SELECT only on reporting metric tables, views and metric_definitions. No grant on connection_secrets, staff, client_users or sync_runs. Create the role in the migration WITHOUT a password; set the password out of band (env / secret manager), never in git.
+- Do NOT impersonate a staff user. Instead, at the start of each tool call the server runs `set local pga.client_id = '<uuid of client_slug>'` inside a transaction.
+- New migration: for every client-scoped table, add a RESTRICTIVE policy for mcp_reader:
+  create policy <table>_mcp_scope on reporting.<table> as restrictive for select to mcp_reader
+    using (client_id = nullif(current_setting('pga.client_id', true), '')::uuid);
+  plus a normal permissive select policy for mcp_reader with the same condition (Postgres needs at least one permissive policy to return rows).
+- list_clients and get_sync_health run as a separate function with security definer that returns only id, name and slug (list_clients), or connection status per client (get_sync_health). No metrics. Pin `set search_path = ''`, and `revoke execute ... from public, anon, authenticated` then `grant execute ... to mcp_reader`: Postgres grants EXECUTE to PUBLIC by default, and the reporting schema is exposed through the Supabase API, so without the revoke any client user could call these and list every client.
+- Tests: (a) mcp_reader can't read connection_secrets; (b) with pga.client_id set to client A it sees only client A's rows in every table and view; (c) with pga.client_id unset it sees zero rows; (d) the role has rolbypassrls = false; (e) anon and authenticated get permission denied calling the list_clients / get_sync_health functions.
 - Tools (all read-only, all take client_slug, all return already-calculated numbers from SQL):
   list_clients, get_client_summary(client_slug, month), compare_periods(client_slug, from, to, compare_from, compare_to), top_campaigns(client_slug, platform, from, to, metric, limit), get_metric_definition(key), get_alerts(client_slug), get_sync_health().
 - Every tool response includes the date range and data freshness (last successful sync), so Claude never presents stale numbers as current.

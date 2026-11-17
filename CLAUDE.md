@@ -17,7 +17,7 @@ This app holds access to every client's ad accounts. One mistake here exposes al
 7. **Data stays in Australia.** Database, storage and job runners live in Sydney (`ap-southeast-2` or `australia-southeast1`). Don't add a service that stores client data offshore without checking with the team first.
 8. **No client data in AI prompts beyond what's needed.** Claude gets aggregated metrics for one client at a time. Never send another client's data, raw tokens, or personal information (lead names, emails, phone numbers).
 9. **Every new table** needs RLS enabled, policies, and an isolation test in `ingestion/tests/test_rls.py`.
-10. **Outside code is untrusted, and licences matter.** Before studying or borrowing from any other repo, read `docs/03-borrowing-from-other-repos.md` and follow its harvesting steps: clone outside this repo, read only (never install or run it), copy only from MIT or Apache 2.0 code, keep the attribution comment, and add an entry to `THIRD_PARTY_NOTICES.md`. Never copy code that touches tokens or auth, and never connect a client account to a hosted third-party service.
+10. **Respect other repos' licences, and treat their code as untrusted.** Read `docs/03-borrowing-from-other-repos.md` before reusing anything. Clone reference repos to `/tmp/ref/`, never into this repo, and never install or run their code. Only MIT or Apache 2.0 code may be adapted, with credit in `THIRD_PARTY_NOTICES.md`. Unlicensed, unverified or "demo only" repos are for ideas only. Never copy token, OAuth or auth code from anywhere: write our own under rules 1 to 3. Never connect a client account to a hosted third-party service.
 
 ## How the data flows
 
