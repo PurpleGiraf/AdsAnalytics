@@ -81,6 +81,25 @@ ruff check . && ruff format --check .
 
 Without uv: `python3.11 -m venv .venv && source .venv/bin/activate && pip install -e '.[dev]'`.
 
+#### Running a sync
+
+```bash
+python -m pganalytics_ingest sync --platform google_ads                       # every client, last 30 days
+python -m pganalytics_ingest sync --platform google_ads --client some-client  # one client
+python -m pganalytics_ingest sync --platform google_ads --days 7
+python -m pganalytics_ingest sync --platform google_ads --from 2026-10-01 --to 2026-10-31
+```
+
+Settings come from the repo-root `.env`. Each connection gets a `reporting.sync_runs` row whether it succeeds or fails, and one failing connection never stops the others. The command exits 1 if any connection failed. Each run replaces the whole date window for each connection, so re-running is always safe and revised or removed rows don't linger.
+
+For a first local test, edit and load the dev seed (it needs a real client customer ID under our MCC):
+
+```bash
+psql "$DATABASE_URL" -f scripts/seed_dev.sql
+```
+
+The first Google Ads run installs the Airbyte connector into `~/.cache/pganalytics/connectors`, which takes a minute. PyAirbyte's anonymous usage telemetry is switched off (`DO_NOT_TRACK=1`). Connector logs go to `/tmp/airbyte/logs`; they don't contain our credentials, but treat them as internal.
+
 #### RLS isolation tests
 
 `tests/test_rls.py` proves each client only sees their own data and that nobody but the service role can read `connection_secrets`. It needs a database:

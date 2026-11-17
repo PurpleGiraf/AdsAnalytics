@@ -1,0 +1,62 @@
+[
+  {
+    "customer.id": 1234567890,
+    "customer.currency_code": "AUD",
+    "campaign.id": 111111111,
+    "campaign.name": "Brand | Search",
+    "segments.date": "2026-10-01",
+    "metrics.impressions": 1520,
+    "metrics.clicks": 87,
+    "metrics.cost_micros": 12345678,
+    "metrics.conversions": 3.0,
+    "metrics.conversions_value": 450.5
+  },
+  {
+    "customer.id": 1234567890,
+    "customer.currency_code": "AUD",
+    "campaign.id": 222222222,
+    "campaign.name": "Generic | Search",
+    "segments.date": "2026-10-01",
+    "metrics.impressions": 9800,
+    "metrics.clicks": 210,
+    "metrics.cost_micros": 268450000,
+    "metrics.conversions": 7.5,
+    "metrics.conversions_value": 1125.25
+  },
+  {
+    "customer.id": 1234567890,
+    "customer.currency_code": "AUD",
+    "campaign.id": 111111111,
+    "campaign.name": "Brand | Search",
+    "segments.date": "2026-10-02",
+    "metrics.impressions": 0,
+    "metrics.clicks": 0,
+    "metrics.cost_micros": 0,
+    "metrics.conversions": 0.0,
+    "metrics.conversions_value": 0.0
+  },
+  {
+    "customer.id": 1234567890,
+    "customer.currency_code": "AUD",
+    "campaign.id": 222222222,
+    "campaign.name": "Generic | Search",
+    "segments.date": "2026-10-02",
+    "metrics.impressions": 10234,
+    "metrics.clicks": 198,
+    "metrics.cost_micros": 251999999,
+    "metrics.conversions": 6.333333,
+    "metrics.conversions_value": 0.0
+  },
+  {
+    "customer.id": 1234567890,
+    "customer.currency_code": "AUD",
+    "campaign.id": 333333333,
+    "campaign.name": "Performance Max",
+    "segments.date": "2026-10-03",
+    "metrics.impressions": 0,
+    "metrics.clicks": 0,
+    "metrics.cost_micros": 0,
+    "metrics.conversions": 1.0,
+    "metrics.conversions_value": 99.0
+  }
+]
