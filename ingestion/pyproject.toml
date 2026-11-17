@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pganalytics_ingest"
+version = "0.1.0"
+description = "PG Analytics ingestion: pulls platform data into the reporting schema."
+requires-python = ">=3.11"
+dependencies = [
+  "airbyte>=0.20",          # PyAirbyte: runs Airbyte connectors as plain Python
+  "dlt>=1.0",               # custom pulls (Google Business Profile)
+  "psycopg[binary]>=3.2",
+  "cryptography>=43",
+  "pydantic-settings>=2.4",
+  "httpx>=0.27",
+  "tenacity>=9.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["pganalytics_ingest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S"]
